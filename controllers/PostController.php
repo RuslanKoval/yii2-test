@@ -109,9 +109,7 @@ class PostController extends Controller
     {
         $model = $this->findModel($id);
         /** @var Post $data */
-//        $data = Post::find()
-//            ->where(['id' => $id])
-//            ->one();
+
         $model->categoriesId = ArrayHelper::getColumn( $model->categories, 'id');
 
         if ($model->load(Yii::$app->request->post())) {

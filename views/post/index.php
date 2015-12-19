@@ -21,13 +21,27 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'title',
             'discription:ntext',
             'createad_at',
+            [
+                'label' => 'Категории',
+                'format' => 'raw',
+                'value' => function(\app\models\Post $model){
 
-            ['class' => 'yii\grid\ActionColumn'],
+                    $result = '' ;
+                    foreach($model->categories  as $category ){
+                            $result.=  Html::a($category->name, ['category/view', 'id' => $category->id]);
+                            $result.='<br>';
+                    }
+                    return $result;
+                }
+            ],
+            ['class' => 'yii\grid\ActionColumn','header'=>'Действие'],
+        ],
+        'tableOptions' => [
+            'class' => 'table table-striped table-bordered'
         ],
     ]); ?>
 
