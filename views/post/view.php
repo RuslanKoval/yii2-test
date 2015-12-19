@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
+
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Post */
 
@@ -25,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
+
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -32,6 +35,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'title',
             'discription:ntext',
             'createad_at',
+            [
+                'label'=>'Categories',
+                'format'=>'html',
+                'value'=> $string
+            ]
+//            Html::encode($string)
         ],
     ]) ?>
 

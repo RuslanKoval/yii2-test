@@ -11,6 +11,10 @@ use Yii;
  * @property string $title
  * @property string $discription
  * @property string $createad_at
+ * @property Category[] $categories
+ *
+ *
+ *
  */
 class Post extends \yii\db\ActiveRecord
 {

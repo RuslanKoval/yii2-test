@@ -3,6 +3,7 @@
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Post */
@@ -22,7 +23,17 @@ use yii\widgets\ActiveForm;
         $result = ArrayHelper::map($list, 'id', 'name');
 
     ?>
-    <?= $form->field($model, 'categoriesId')->dropDownList($result, array('prompt'=> 'Please Select', 'multiple' => 'multiple')) ?>
+
+    <?=
+    $form->field($model, 'categoriesId')->widget(Select2::classname(), [
+        'data' => $result,
+        'options' => ['placeholder' => 'Select a state ...'],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'multiple' => true
+        ],
+    ]);
+    ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -6,6 +6,8 @@ use Yii;
 use app\models\Post;
 use app\models\Category;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -36,7 +38,6 @@ class PostController extends Controller
         $dataProvider = new ActiveDataProvider([
             'query' => Post::find(),
         ]);
-
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -49,8 +50,22 @@ class PostController extends Controller
      */
     public function actionView($id)
     {
+        /** @var Post $data */
+        $data = Post::find()
+            ->where(['id' => $id])
+            ->one();
+        $cat = $data->categories;
+        $string = "";
+        foreach($cat as $value) {
+            $string.=  Html::a($value->name, ['category/view', 'id' => $value->id]);
+            $string.='<br>';
+        }
+
+
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'string' => $string,
         ]);
     }
 
@@ -63,7 +78,7 @@ class PostController extends Controller
     {
         $model = new Post();
         if ($model->load(Yii::$app->request->post())) {
-            $model->createad_at = date('m.d.y');
+            $model->createad_at = time();
             $model->save();
 
             $data = Category::find()
@@ -93,8 +108,21 @@ class PostController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        /** @var Post $data */
+//        $data = Post::find()
+//            ->where(['id' => $id])
+//            ->one();
+        $model->categoriesId = ArrayHelper::getColumn( $model->categories, 'id');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $data = Category::find()
+                ->where(['id' => $model->categoriesId])
+                ->all();
+            $model->unlinkAll('categories', true);
+            foreach($data as $category) {
+                $category->link('posts', $model);
+            }
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
@@ -111,7 +139,10 @@ class PostController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->unlinkAll('categories', true);
+        $model->delete();
+
 
         return $this->redirect(['index']);
     }
