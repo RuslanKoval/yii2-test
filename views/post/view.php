@@ -40,8 +40,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Categories',
                 'format'=>'html',
                 'value'=> $string
+            ],
+            [
+                'label'=>'Coments',
+                'format'=>'html',
+                'value'=> $comentStr
             ]
-//            Html::encode($string)
         ],
     ]) ?>
 

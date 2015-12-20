@@ -56,6 +56,15 @@ class PostController extends Controller
             ->where(['id' => $id])
             ->one();
         $cat = $data->categories;
+        $postComents = ArrayHelper::getColumn( $data->comments, 'description');
+        $comentStr = "";
+        foreach($postComents as $value) {
+            $comentStr.= "<p>".$value."</p><hr>";
+        }
+
+
+        print_r($postComents);
+
         $string = "";
         foreach($cat as $value) {
             $string.=  Html::a($value->name, ['category/view', 'id' => $value->id]);
@@ -64,13 +73,16 @@ class PostController extends Controller
 
         $coment = new Coments();
         if ($coment->load(Yii::$app->request->post())) {
-            print_r($coment->description);
+            $coment->post_id = $id;
+            $coment->save();
+            return $this->redirect(['view', 'id' => $id]);
         }
 
         return $this->render('view', [
             'model' => $this->findModel($id),
             'string' => $string,
-            'coment' => $coment
+            'coment' => $coment,
+            'comentStr' => $comentStr
         ]);
     }
 
