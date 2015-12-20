@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Post;
 use app\models\Category;
+use app\models\Coments;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -61,11 +62,15 @@ class PostController extends Controller
             $string.='<br>';
         }
 
-
+        $coment = new Coments();
+        if ($coment->load(Yii::$app->request->post())) {
+            print_r($coment->description);
+        }
 
         return $this->render('view', [
             'model' => $this->findModel($id),
             'string' => $string,
+            'coment' => $coment
         ]);
     }
 
@@ -93,8 +98,7 @@ class PostController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
-                'model' => $model,
-                'Category' => new Category(),
+                'model' => $model
             ]);
         }
     }

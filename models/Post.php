@@ -12,6 +12,7 @@ use Yii;
  * @property string $discription
  * @property string $createad_at
  * @property Category[] $categories
+ * @property Coments[] $comments
  *
  *
  *
@@ -59,5 +60,14 @@ class Post extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Category::className(), ['id' => 'category_id'])
             ->viaTable('post_category', ['post_id' => 'id']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getComments()
+    {
+        return $this->hasMany(Coments::className(), ['post_id' => 'id']);
     }
 }
