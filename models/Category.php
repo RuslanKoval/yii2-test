@@ -12,6 +12,8 @@ use Yii;
  */
 class Category extends \yii\db\ActiveRecord
 {
+
+
     /**
      * @inheritdoc
      */

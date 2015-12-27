@@ -1,73 +1,81 @@
 <?php
-
 namespace app\models;
-
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
+use Yii;
+use yii\web\IdentityInterface;
+use yii\db\ActiveRecord;
+/**
+ * This is the model class for table "user".
+ *
+ * @property integer $id
+ * @property string $login
+ * @property string $password_hash
+ * @property integer $created_at
+ * @property integer $status
+ */
+class User extends ActiveRecord implements IdentityInterface
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
     /**
      * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['created_at', 'status'], 'integer'],
+            [['login'], 'string', 'max' => 20],
+            [['password_hash'], 'string', 'max' => 200],
+        ];
+    }
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'login' => 'Login',
+            'password_hash' => 'Password Hash',
+            'created_at' => 'Created At',
+            'status' => 'Status',
+        ];
+    }
+
+    /**
+     * @param int|string $id
+     * @return null|static
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return static::findOne($id);
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $token
+     * @param null $type
+     * @return null
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
         return null;
     }
 
     /**
-     * Finds user by username
-     *
-     * @param  string      $username
-     * @return static|null
+     * @param $username
+     * @return null|static
      */
-    public static function findByUsername($username)
+    public static function findByUserName($username)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return static::findOne(['login' => $username]);
     }
 
     /**
-     * @inheritdoc
+     * @return int
      */
     public function getId()
     {
@@ -75,29 +83,36 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
     }
 
     /**
-     * @inheritdoc
+     * @return mixed
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return $this->auth_key;
     }
 
     /**
-     * @inheritdoc
+     * @param string $authKey
+     * @return bool
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return $this->getAuthKey() === $authKey;
     }
 
     /**
-     * Validates password
-     *
-     * @param  string  $password password to validate
-     * @return boolean if password provided is valid for current user
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password_hash;
+    }
+
+    /**
+     * @param $password
+     * @return bool
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return password_verify($password, $this->getPassword());
     }
 }

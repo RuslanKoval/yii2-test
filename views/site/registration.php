@@ -4,7 +4,7 @@
 /* @var $model app\models\LoginForm */
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-$this->title = 'Login';
+$this->title = 'Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>Please fill out the following fields to login:</p>
 
     <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
+        'id' => 'registration-form',
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
             'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
@@ -21,23 +21,17 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+    <?= $form->field($model, 'login')->textInput(['autofocus' => true]) ?>
 
-    <?= $form->field($model, 'password')->passwordInput() ?>
-
-    <?= $form->field($model, 'rememberMe')->checkbox([
-        'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-    ]) ?>
+    <?= $form->field($model, 'password_hash')->passwordInput() ?>
+    <?= $form->field($model, 'passwordConfirm')->passwordInput() ?>
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Register', ['class' => 'btn btn-primary', 'name' => 'register-button']) ?>
         </div>
     </div>
 
     <?php ActiveForm::end(); ?>
 
-    <div class="col-lg-offset-1" style="color:#999;">
-        <?= Html::a('Registration', ['site/registration']) ?>
-    </div>
 </div>

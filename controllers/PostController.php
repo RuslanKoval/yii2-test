@@ -7,6 +7,7 @@ use app\models\Post;
 use app\models\Category;
 use app\models\Coments;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
@@ -21,10 +22,14 @@ class PostController extends Controller
     public function behaviors()
     {
         return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'create', 'delete', 'update'],
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];
@@ -56,14 +61,14 @@ class PostController extends Controller
             ->where(['id' => $id])
             ->one();
         $cat = $data->categories;
-        $postComents = ArrayHelper::getColumn( $data->comments, 'description');
-        $comentStr = "";
-        foreach($postComents as $value) {
-            $comentStr.= "<p>".$value."</p><hr>";
-        }
-
-
+//        $postComents = ArrayHelper::getColumn( $data->comments, 'description');
+        $postComents = $data->comments;
         print_r($postComents);
+        $comentStr = "";
+        foreach($postComents as $key => $value) {
+            $comentStr.= "<p>".$value->description."</p>";
+            $comentStr.= "<h6> leave a comment : ".$value->create_as."</h6><hr>";
+        }
 
         $string = "";
         foreach($cat as $value) {
@@ -74,6 +79,7 @@ class PostController extends Controller
         $coment = new Coments();
         if ($coment->load(Yii::$app->request->post())) {
             $coment->post_id = $id;
+            $coment->create_as = Yii::$app->user->identity->getId();
             $coment->save();
             return $this->redirect(['view', 'id' => $id]);
         }

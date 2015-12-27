@@ -29,6 +29,7 @@ class Coments extends \yii\db\ActiveRecord
     {
         return [
             [['post_id'], 'integer'],
+            [['create_as'], 'string'],
             [['description'], 'string']
         ];
     }
@@ -41,6 +42,7 @@ class Coments extends \yii\db\ActiveRecord
         return [
             'post_id' => 'Post ID',
             'description' => 'Coment',
+            'create_as' => 'Create as',
         ];
     }
 

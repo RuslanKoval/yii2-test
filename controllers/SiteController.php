@@ -1,14 +1,12 @@
 <?php
-
 namespace app\controllers;
-
+use app\models\LoginForm;
+use app\models\RegistrationForm;
 use Yii;
+use yii\db\mssql\PDO;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
-
+use yii\web\User;
 class SiteController extends Controller
 {
     public function behaviors()
@@ -16,40 +14,45 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['registration', 'login', 'logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
+                        'actions' => ['registration'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['login'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout'],
                         'roles' => ['@'],
                     ],
                 ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
-
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
     }
 
     public function actionIndex()
     {
-        return $this->render('index');
+        if (Yii::$app->user->isGuest) {
+            return $this->actionLogin();
+        } else {
+            return $this->render('index');
+        }
+    }
+
+    public function actionCategories()
+    {
+        return $this->render('categories');
+    }
+
+    public function actionPosts()
+    {
+        return $this->render('posts');
     }
 
     public function actionLogin()
@@ -57,38 +60,32 @@ class SiteController extends Controller
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
         return $this->render('login', [
-            'model' => $model,
+            'model' => $model
         ]);
     }
 
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
-        return $this->goHome();
+        return $this->actionIndex();
     }
 
-    public function actionContact()
+    public function actionRegistration()
     {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
+        $model = new RegistrationForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->password_hash = password_hash($model->password_hash, 1);
+            if ($model->save(false)) {
+                return $this->render('congratulations');
+            }
         }
-        return $this->render('contact', [
-            'model' => $model,
+        return $this->render('registration', [
+            'model' => $model
         ]);
-    }
-
-    public function actionAbout()
-    {
-        return $this->render('about');
     }
 }

@@ -9,6 +9,7 @@ class m151220_153349_coments extends Migration
     {
         $this->createTable('coments', [
             'post_id' => $this->integer(),
+            'create_as' => $this->string(50),
             'description' => $this->text(),
         ]);
         $this->addForeignKey("fk_coments", "coments", "post_id", "post", "id");
